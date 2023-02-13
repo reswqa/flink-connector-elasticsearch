@@ -22,6 +22,7 @@ import org.apache.http.HttpHost;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.refresh.RefreshRequest;
+import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
@@ -42,6 +43,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.apache.flink.util.Preconditions.checkNotNull;
@@ -110,6 +112,15 @@ public class Elasticsearch7Client implements ElasticsearchClient {
             }
         } catch (IOException e) {
             LOG.error("Cannot create index {}", indexName, e);
+        }
+    }
+
+    public Map<String, Object> get(String index, String id) {
+        try {
+            return restClient.get(new GetRequest(index, id), RequestOptions.DEFAULT).getSource();
+        } catch (IOException e) {
+            LOG.error("Cannot get data from index {}", index, e);
+            return Collections.emptyMap();
         }
     }
 
